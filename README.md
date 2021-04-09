@@ -1,5 +1,27 @@
 
-### Helium Console Activities
+### 1. A word about join failures
+
+The process of joining the Helium network can seem to be fickle at times. There are several factors to keep in mind
+##### Credentials
+Helium only supports OTAA joins at this time. This means your edge node device must have provisioned with the application the proper LoRaWan credentials that "must" match those seen within the device configuration within the Console. These includes
+```
+- Device EUI
+- App EUI
+- App Key
+```
+
+These "must" be added to your device sketch in the proper format and the proper Endian-ness, which can vary from one edge node device LoRaWan runtime implementation to the next.
+
+##### Distance to Nearest Hotspot
+While LoRaWan is advertised as a long distance communications protocol there are many factors that can limit connectivity. The primary being unubstructed line of sight. Trees, buildings, mountains can limit the reach of your devices.
+If there is any distance at all between your edge node device and the nearest hot spot and you are having trouble joining the network. It is suggested you take a field trip to get closer to the target hot spot to see if connection can be made when in close proximity.
+Most runtime implementations will vary the data rate used for joining to try to compenstate for hot spot distance. The specific algorithm is highly implementation dependent.
+ 
+ ##### Edge node device LoRaWan runtime join retry implementation
+ Each runtime implementation of the LoRaWan specification is going to be different. Some runtimes will continuously try to join the network until power is removed. Some may provide an API or global variable which determines the number of join attempts to make before either pausing before retrying, aborting the join retry with notification sent to the device application via a callback mechanism, or aborting retry without notifying the device application (which is really not acceptable).
+ 
+
+### 2. Helium Console Activities
 
 Now that basic communications between the edge node device and the Helium network has been confirmed there are a few things one can do within the Helium Console product that you should be aware of when implementing your own custom device application.
 
