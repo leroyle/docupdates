@@ -54,9 +54,14 @@ The debug view can be very helpful when trying to diagnose communications issues
   #### Network Data Flow
   The following diagram illustrates one possible communication flow from an edge node device, through the Helium Console and on to the integration server.
   Note: the ordering of the data flows as seen within the Console device debug view may not eactly match those seen in the illustration below.
-  
-  ![](./flow.png)
 
+This next diagram illustrates the data flow when sending unconfirmed uplink messages.
+  
+  ![](./unconfirmed.png)
+
+
+This next diagram illustrates the data flow when sending confirmed uplink messages.
+  ![](./unconfirmed.png)
   
   ## Editor Note:
   We should add the flow for confirmed messages, downlinks, ADR 
