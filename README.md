@@ -1,16 +1,16 @@
 
-### 1. A word about join failures
 
 The process of joining the Helium network can seem to be fickle at times. There are several factors to keep in mind
 ##### Credentials
-Helium only supports OTAA joins at this time. This means your edge node device must have provisioned with the application the proper LoRaWan credentials that "must" match those seen within the device configuration within the Console. These includes
+Helium only supports OTAA joins at this time. This means your edge node device application must be provisioned with the the proper LoRaWan credentials as found within the device configuration view within the Console. These includes
 ```
 - Device EUI
 - App EUI
 - App Key
 ```
 
-These "must" be added to your device sketch in the proper format and the proper Endian-ness, which can vary from one edge node device LoRaWan runtime implementation to the next.
+#### NOTE: These "must" be added to your device sketch in the proper byte vs string format as well as with the proper Endian-ness. These can and do vary from one edge node device LoRaWan runtime implementation to the next.
+Visit the follow Wikipedia page for a comprehensive discussion of endianness https://en.wikipedia.org/wiki/Endianness
 
 ##### Distance to Nearest Hotspot
 While LoRaWan is advertised as a long distance communications protocol there are many factors that can limit connectivity. The primary being unubstructed line of sight. Trees, buildings, mountains can limit the reach of your devices.
@@ -106,14 +106,17 @@ board_build.arduino.lorawan.rgb = DEACTIVE
 board_build.arduino.lorawan.debug_level = FREQ_AND_DIO
 ```
 
-#### NOTE:  We should have a comprehensive list of those params that are absolutly required along with their definitions/values
-```
- Region  (LoRaWan frequency region)
- Uplink Message confirmation (Confirmed/Unconfirmed)
- Class  (A/B/C)
- ADR    (Enabled/Disabled)
- Activation Mode (OTAA/ABP) 
- ```
+### Typical LoRaWan Configuration Settings for Region US915
+| Name               |  US915 Value    | Description                                                               |
+|:-------------------|:----------------|:--------------------------------------------------------------------------|
+| Region             | US915           | (US915/EU868/CN470/etc) LoRaWan Region designation                        |
+| Confirm Message    | Unconfirmed     | (Confirmed/UnConfirmed) - determines if each uplink message is confirmed by the network             |
+| Class              | A               | (A/B/C) - LoRaWan Communication Class                                       |
+| Activation         | OTAA            | (OTAA/ABP) OTAA - Over the Air Activation or ABP - Authentication By Personalisation |
+| Adaptive Data Rate | OFF             | (ON/OFF) - Automatic data rate changes depending on radio reception                  |
+
+
+### 1. A word about join failures
 
 Misc:
 
