@@ -1,5 +1,7 @@
 
 
+### 1. A word about join failures
+
 The process of joining the Helium network can seem to be fickle at times. There are several factors to keep in mind
 ##### Credentials
 Helium only supports OTAA joins at this time. This means your edge node device application must be provisioned with the the proper LoRaWan credentials as found within the device configuration view within the Console. These includes
@@ -50,8 +52,8 @@ The usage of the Console debug view is documented here: https://docs.helium.com/
 The debug view can be very helpful when trying to diagnose communications issues.
 
   
-  
-  #### Network Data Flow
+ 
+### 3. Network Data Flow
   The following diagram illustrates one possible communication flow from an edge node device, through the Helium Console and on to the integration server.
   Note: the ordering of the data flows as seen within the Console device debug view may not eactly match those seen in the illustration below.
 
@@ -66,14 +68,14 @@ This next diagram illustrates the data flow when sending confirmed uplink messag
   ## Editor Note:
   We should add the flow for confirmed messages, downlinks, ADR 
   
-##  Misc Info for a "Intro to LoRaWan Doc
+### Typical LoRaWan Settings
   LoRAWan settings: 
-The following document is in answer to a member's off line query about typical device app LoRaWan configuration settings. (Not that there is a typical that cover all boards.)  I think we cover those absolutely required within the "examples" in the doc set, but not the optionals. Feel free to PM me some additions. I'm not sure where it will go in the docs.
+The following is an answer to a member's off line query about typical device app LoRaWan configuration settings. (Not that there is a typical that cover all boards.)  I think we cover those absolutely required within the "examples" in the doc set, but not the optionals. 
 
 
 As usual this my current understanding, corrections are of course welcome
 
- Typical LoRaWan device configuration settings for North America US915
+#### LoRaWan Configuration variables
 
 Each board support package within the IDE exposes a different set of configuration variables. Some may be exposed at the IDE level while others are exposed via global varaiable within the device application sketch and still others may be hard coded within the runtime.
 
@@ -111,7 +113,7 @@ board_build.arduino.lorawan.rgb = DEACTIVE
 board_build.arduino.lorawan.debug_level = FREQ_AND_DIO
 ```
 
-### Typical LoRaWan Configuration Settings for Region US915
+### Typical LoRaWan Configuration Settings for Region US915 (North America)
 | Name               |  US915 Value    | Description                                                               |
 |:-------------------|:----------------|:--------------------------------------------------------------------------|
 | Region             | US915           | (US915/EU868/CN470/etc) LoRaWan Region designation                        |
@@ -121,7 +123,6 @@ board_build.arduino.lorawan.debug_level = FREQ_AND_DIO
 | Adaptive Data Rate | OFF             | (ON/OFF) - Automatic data rate changes depending on radio reception                  |
 
 
-### 1. A word about join failures
 
 Misc:
 
