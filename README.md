@@ -61,3 +61,75 @@ The debug view can be very helpful when trying to diagnose communications issues
   ## Editor Note:
   We should add the flow for confirmed messages, downlinks, ADR 
   
+##  Misc Info for a "Intro to LoRaWan Doc
+  LoRAWan settings: 
+The following document is in answer to a member's off line query about typical device app LoRaWan configuration settings. (Not that there is a typical that cover all boards.)  I think we cover those absolutely required within the "examples" in the doc set, but not the optionals. Feel free to PM me some additions. I'm not sure where it will go in the docs.
+
+
+As usual this my current understanding, corrections are of course welcome
+
+ Typical LoRaWan device configuration settings for North America US915
+
+Each board support package within the IDE exposes a different set of configuration variables. Some may be exposed at the IDE level while others are exposed via global varaiable within the device application sketch and still others may be hard coded within the runtime.
+
+The acutal configuration variables supported by a given board/runtime will vary depending on the implementation.
+
+
+ These below are for the Heltec CubeCell runtime only.
+ Until you are familiar with their configuration behavior it is recommended you set the board options as follows:
+
+ Via Arduino IDE: 
+ ```
+Select Tools -> LORAWAN_REGION: -> REGION_US915
+Select Tools -> LORAWAN_CLASS: -> CLASS_A
+Select Tools -> LORAWAN_NETMODE: -> OTTA
+Select Tools -> LORAWAN_ADR: -> OFF
+Select Tools -> LORAWAN_UPLINKMODE: -> UNCONFIRMED
+Select Tools -> LORAWAN_Net_Reservation: -> OFF
+Select Tools -> LORAWAN_AT_SUPPORT: -> OFF
+Select Tools -> LORAWAN_AT_RGB : -> ACTIVE
+Select Tools -> LoRaWan_ Debug Level : -> FREQ&&DIO (for most verbose messages)
+```
+Within PlatformIO platformio.ini file:
+```
+board_build.arduino.lorawan.region = US915
+board_build.arduino.lorawan.class = CLASS_A
+board_build.arduino.lorawan.netmode = OTAA
+board_build.arduino.lorawan.adr = OFF
+board_build.arduino.lorawan.uplinkmode = UNCONFIRMED
+;board_build.arduino.lorawan.uplinkmode = CONFIRMED
+board_build.arduino.lorawan.net_reserve = OFF
+board_build.arduino.lorawan.at_support = OFF
+; ACTIVE or DEACTIVE
+board_build.arduino.lorawan.rgb = DEACTIVE
+; NONE, FREQ, FREQ_AND_DIO
+board_build.arduino.lorawan.debug_level = FREQ_AND_DIO
+```
+
+#### NOTE:  We should have a comprehensive list of those params that are absolutly required along with their definitions/values
+```
+ Region  (LoRaWan frequency region)
+ Uplink Message confirmation (Confirmed/Unconfirmed)
+ Class  (A/B/C)
+ ADR    (Enabled/Disabled)
+ Activation Mode (OTAA/ABP) 
+ ```
+
+Misc:
+
+Other important configurations that are set either via global variable or runtime API: (again it varies by implementation)
+
+Sub Band and/or userChannelsMask[] are used to limit the channels used when communicating to the Helium network. These prevent the runtime from trying to use all 64 LoRaWan channels when Helium only supports a few.
+```
+Some runtimes use:
+/*LoraWan channelsmask, default channels 0-7*/
+uint16_t userChannelsMask[6]={ 0xFF00,0x0000,0x0000,0x0000,0x0000,0x0000 };
+
+
+Some runtimes use:
+XXX_setSubBandChannels(2);   // XXX_ varies by runtime
+```
+
+Some runtimes set the proper default for Helium Region US915
+
+
