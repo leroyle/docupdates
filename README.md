@@ -2,7 +2,7 @@
 
 ### 1. A word about join failures
 
-The process of joining the Helium network can seem to be fickle at times. There are several factors to keep in mind
+The process of joining the Helium network can seem to be fickle at times. This is probably the hardest piece of the LoRaWan communications stream to debug as you have limited exposure to what is happening. There are several factors to keep in mind
 ##### Credentials
 Helium only supports OTAA joins at this time. This means your edge node device application must be provisioned with the the proper LoRaWan credentials as found within the device configuration view within the Console. These includes
 ```
@@ -11,17 +11,33 @@ Helium only supports OTAA joins at this time. This means your edge node device a
 - App Key
 ```
 
-#### NOTE: These "must" be added to your device sketch in the proper byte vs string format as well as with the proper Endian-ness. These can and do vary from one edge node device LoRaWan runtime implementation to the next.
+#### NOTE: These "must" be added to your device sketch in the proper byte vs string format as well as with the proper Endian-ness. These can and do vary from one edge node device LoRaWan runtime implementation to the next. Your device will not join the network if these are not exactly correct.
 Visit the follow Wikipedia page for a comprehensive discussion of endianness https://en.wikipedia.org/wiki/Endianness
+
+##### LoRaWan Configuration Parameters
+There are a few parameters that must be configured properly not only for the join process to success but for further communications as well. These are detailed further in their own section [here](#LoRaWan_Configuration_Variables).  
+For joins we need to pay particular attention to LoRaWan Region, Claas (Class A only) and Activation Mode(OTAA only).  
+What these are specifically named and how they are set varies from one LoRaWan runtime implementation to another.
 
 ##### Distance to Nearest Hotspot
 While LoRaWan is advertised as a long distance communications protocol there are many factors that can limit connectivity. The primary being unubstructed line of sight. Trees, buildings, mountains can limit the reach of your devices.
 If there is any distance at all between your edge node device and the nearest hot spot and you are having trouble joining the network. It is suggested you take a field trip to get closer to the target hot spot to see if connection can be made when in close proximity.
-Most runtime implementations will vary the data rate used for joining to try to compenstate for hot spot distance. The specific algorithm is highly implementation dependent.
+Most runtime implementations will vary the data rate and perhaps power level used for joining in order to try to compenstate for hot spot distance. The specific algorithm and effectiveness is highly LoRaWan runtime implementation dependent.
  
  ##### Edge node device LoRaWan runtime join retry implementation
- Each runtime implementation of the LoRaWan specification is going to be different. Some runtimes will continuously try to join the network until power is removed. Some may provide an API or global variable which determines the number of join attempts to make before either pausing before retrying, aborting the join retry with notification sent to the device application via a callback mechanism, or aborting retry without notifying the device application (which is really not acceptable).
+In general when your device tries to join the network if an initial join fails the runtime will attempt retries.
+Each runtime implementation of the LoRaWan specification may handle join retries in a different manner as this is not detailed by the specification.
+* Some runtimes will continuously try to join the network until power is removed.
+* Some may provide an API or global variable which determines the number of join attempts to make
+* Some may when exhausting the retry count  
+    * pausing before retrying
+    * aborting the join retry with notification sent to the device application via a callback mechanism
+    * or aborting retry without notifying the device application (which is really not acceptable).
  
+##### Successful Join
+An indication of a successful join is generally provided via a target device debug message dumped to the serial debug port, if attached and active, via an led indication of the device application if programmed to provide it, or via the Helium Console device debug view documented here: https://docs.helium.com/use-the-network/console/debug/  
+
+After the join has succedded the normal device uplink messages can be sent. Beware however of the time on air limitation of the LoRaWan specification. You cannot and most runtimes will not let you continuus transmit over the air. The time constraints are Region specific. Trying to send message too fast may result in lost messages and interruption of the timing windows required for the device to receive downlink messages from the network.
 
 ### 2. Helium Console Activities
 
@@ -75,7 +91,7 @@ The following is an answer to a member's off line query about typical device app
 
 As usual this my current understanding, corrections are of course welcome
 
-#### LoRaWan Configuration variables
+#### LoRaWan Configuration variables<a name="LoRaWan_Configuration_Variables"></a>
 
 Each board support package within the IDE exposes a different set of configuration variables. Some may be exposed at the IDE level while others are exposed via global varaiable within the device application sketch and still others may be hard coded within the runtime.
 
