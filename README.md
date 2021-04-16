@@ -195,8 +195,26 @@ Your user payload should be at the tail end of the raw payload whether it contai
 If you're really interested in the raw payload: you can use a packet decoder at https://discord.com/channels/404106811252408320/730245319882965093/816533671368458240
 
 
-### Data Rate Spreading factor after Join
-RE: "The data spreading factor/bw is SF10BW125"
-For US SF10 equates to DR_0, for joins it seems common to use SF10 (DR_0) for most attempts with SF7 (DR_3) or SF8 (DR_4) tossed in for randomness.
- What the runtimes use after a join seems to be implementation dependent.
-Some will use what ever data rate (SF) resulted in a successful join, some have a runtime global define, some allow override via  sketch #define, some actually support an API. Might be interesting to know what TTGO's runtime does.
+### Data Rate/Spreading factor after Join
+Once a network join has succeeded, what data rate is used when sending user data up to the network (uplink)?
+That depends.
+
+At least a "few" of the runtimes investigated seem to use the data rate (also related to Spreading Factor) that is defined by either:
+* a runtime globally defined value
+* a device application override of that global value, via "#define" or setting the global variable
+* a device application override via an API call
+
+#### If ADR (Adaptive Data Rate) is disabled,
+If ADR is not enabled the runtime will use this data rate for subsequent uplinks. 
+NOTE: each data rate has a maximum user packet size allowed for that data rate, what happens if you exceed that data rate?
+* the runtime may return an error code when calling the send API
+* the runtime may call a callback
+* the runtime may just fail to send, silently  
+
+Thus it is very important to understand the packet size implecations.
+
+#### If ADR (Adaptive Data Rate) is enabled
+At this point in the specifications life the data rate used after a successful join with ADR enabled is device runtime imlementation dependent. Best that can be assumed is that in the beginning either a default of DR_0 was used or the data rate used for a successful join, which in most cases was DR_0.  
+
+Subsequent iterrations of runtimes as well as the Semtech reference platform seem to be migrating to using either that default data data rate. 
+
