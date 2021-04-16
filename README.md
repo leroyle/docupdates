@@ -59,6 +59,31 @@ The repository can be found at: https://github.com/helium/console-decoders.
 
 NOTE: The user data packet is encoded using a base64 format when being sent over the air. The data presented to the Console decoder function has been base64 decoded for you. If one waits and decodes at the cloud integration server that packet data is still base64 encoded thus you will need to base64 decode the packet  before re-expansion at the server.
 
+##### Adding a try/catch mechanism to your decoder
+During decoder development it is sometimes helpful to implement javascript try/catch mechanisms with your decoders in order to catch unforseen errors. One example might be: 
+```
+var myMsg = {};
+
+function Decoder(bytes, port) { 
+   try{
+     foo = bar;
+     myMsg.err = ret;
+   } catch (err) {
+    return 'Decoder: ' + err.name + " : " + err.message;; 
+   }
+}
+```
+with the above try/catch in place you get the following message when testing the function with the function "Script Validator"  
+```
+"Decoder: ReferenceError : bar is not defined"
+``` 
+
+With out the try catch in place 
+```
+Your function threw an exception
+```
+As you can see your debugging effort might benefit from using a try/catch mechanism within your decoder.
+
 
 #### Helium Console device debug view
 
@@ -216,5 +241,15 @@ Thus it is very important to understand the packet size implecations.
 #### If ADR (Adaptive Data Rate) is enabled
 At this point in the specifications life the data rate used after a successful join with ADR enabled is device runtime imlementation dependent. Best that can be assumed is that in the beginning either a default of DR_0 was used or the data rate used for a successful join, which in most cases was DR_0.  
 
-Subsequent iterrations of runtimes as well as the Semtech reference platform seem to be migrating to using either that default data data rate. 
+Subsequent iterrations of runtimes as well as the Semtech reference platform seem to be migrating to using either the runtimes default data data rate or that specified by the device application via a variable or API call. However, not all runtimes will honor the device applicaiton specified rate. It is worth investigating to see what your runtime will do in this case.
+
+All runtimes "should", with ADR enabled, attempt to adapt the data rate and or power settints for most optimal communications at some point in time. The Helium network will gather statistics from 20 sucessful uplinks before returning a downlink MAC message to the runtime suggesting changes. One may see one or more consecutive messages conveying the information to the runtime.
+
+NOTE: As far as we know the device application is "not" notified of runtime data rate changes. And not all runtimes will expose the runtimes current data rate setting. This makes it very problematic if a device application has a packet size requirement larger that the lowest data rate (DR_0) allows.  
+If a device application with ADR enabled requires a larger packet size than a data rate that may be suggested by the network ADR mechanism what happens?
+* typically the device application may not be able to query the runtime for a current value, thus cannot dynamically modify packet size
+* if the device application packet size is too large, the send API will fail, perhaps silently (implementation dependent)
+    * the device runtime "might" return a send API fail status that contains an error code that "could" be used to decern a too larger of packet is being attempted. It's not clear at this time if this is a viable strategy. 
+
+
 
