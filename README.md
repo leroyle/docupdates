@@ -16,14 +16,14 @@ Visit the follow Wikipedia page for a comprehensive discussion of endianness htt
 
 ##### LoRaWan Configuration Parameters
 There are a few parameters that must be configured properly not only for the join process to success but for further communications as well. These are detailed further in their own section [here](#LoRaWan_Configuration_Variables).  
-For joins we need to pay particular attention to LoRaWan Region, Claas (Class A only) and Activation Mode(OTAA only).  
+For joins we need to pay particular attention to LoRaWan Region, Claas (Class A only) and Activation Mode(OTAA only), LoRaWan subband: should be 2 for best join possibiity.
 What these are specifically named and how they are set varies from one LoRaWan runtime implementation to another.
 
 ##### Distance to Nearest Hotspot
 While LoRaWan is advertised as a long distance communications protocol there are many factors that can limit connectivity. The primary being unubstructed line of sight. Trees, buildings, mountains can limit the reach of your devices.
 If there is any distance at all between your edge node device and the nearest hot spot and you are having trouble joining the network. It is suggested you take a field trip to get closer to the target hot spot to see if connection can be made when in close proximity.
-Most runtime implementations will vary the data rate and perhaps power level used for joining in order to try to compenstate for hot spot distance. The specific algorithm and effectiveness is highly LoRaWan runtime implementation dependent.
- 
+Most runtime implementations will vary the data rate and perhaps power level used for joining in order to try to compenstate for hot spot distance. The specific algorithm and effectiveness is highly LoRaWan runtime implementation dependent. For the North American region it is common to use a spreading factor of 10 ( SF10 - equates to DR_0) along with occasional randome use of SF7 (DR_3) or SF8 (DR_4) tossed in. As alot of this, it's runtime implementation dependent.
+
  ##### Edge node device LoRaWan runtime join retry implementation
 In general when your device tries to join the network if an initial join fails the runtime will attempt retries.
 Each runtime implementation of the LoRaWan specification may handle join retries in a different manner as this is not detailed by the specification.
@@ -143,8 +143,13 @@ board_build.arduino.lorawan.debug_level = FREQ_AND_DIO
 Misc:
 
 Other important configurations that are set either via global variable or runtime API: (again it varies by implementation)
+### LoRaWan Subband
+The runtimes definition of sub band, also known as channel mask or usersChannelsMask is used to inform the runtime of specific frequency channels that should be used for optimal communications with the network.  
+For instance the LoRaWan specificiation calls out the use of 64 frequency bands that could be used when attempting the intial join. Helium as well as other providers have chosen to limit the number of frequencies supported to one sub band or 8 frequencies.  
+Unless we inform the runtime of this fact it will attempt to use all 64 channels in a random fashion. Thus it may take many retries before a supported frequency is attempted thus causing at times an unacceptable delay in makeing that initial join.
 
-Sub Band and/or userChannelsMask[] are used to limit the channels used when communicating to the Helium network. These prevent the runtime from trying to use all 64 LoRaWan channels when Helium only supports a few.
+Once a join has succeeded and an intial uplink has been received by the Helium network, the network will respond with a downlink message targeting the runtime to inform it of the proper channel mask to use. Defining it up front can greatly reduce iniital join time.
+
 ```
 Some runtimes use:
 /*LoraWan channelsmask, default channels 0-7*/
@@ -157,4 +162,41 @@ XXX_setSubBandChannels(2);   // XXX_ varies by runtime
 
 Some runtimes set the proper default for Helium Region US915
 
+### Downlink Shows Larger Packet Size Than Expected
+#### Question
+Hi, I just tried sending a 6-byte downlink command to a device.. used the console downlink tool to send it and used the "Bytes" option and entered the bytes in base64 format. 
 
+When it was queued, the payload size was 6 bytes as expected, but when it was actually sent, the payload size suddenly was 29 bytes and when I decoded the base64 payload, I couldn't recognize any of the hex bytes in there.
+
+I guess the main question is: Should the payload be exactly the same as when it was queued or did the code somehow append more data or re-encode it somehow to make it a much larger size?.. what actual bytes would the device "see" when it gets the request?
+
+Details:
+
+Original data: 20 21 22 23 24 25 .. sent this base64 string from console tool: ICEiIyQl
+
+Actual payload (base64) that was sent:
+  "payload": "oBYCAEgKAQADAAAAcAMAAP8AZD8OTdJujpivgIY=",
+  "payload_size": 29,
+
+ .. which translates to raw hex of: a0 16 02 00 48 0a 01 00 03 00 00 00 70 03 00 00 ff 00 64 3f 0e 4d d2 6e 8e 98 af 80 86(edited)
+
+#### Answer
+The down links will sometimes contain Mac data along with user data. Generally it's the first downlink after the first uplink after an initial join. 
+It contains Channel designation suggestion, data rate and power settings echo back.
+You'll see that in the console and it will be delivered to your device runtime so you may see in with the device debug logs, however, the runtime will strip that MAC data out and deliver to your application via the callback, only the user data you expect.
+
+That initial message needs to be acknowledged by your device run time. If it's not the network will continue to send it. So are you seeing just the one down link with the large payload or multiple.?
+
+
+If you have ADR enabled you will see another larger payload downlink after about 20 or so uplinks, I think it's 20. That's the network sending another MAC or perhaps more than one, to suggestion to the runtime more efficient data rate/spreading factor and power setting based on received signal data.
+
+Your user payload should be at the tail end of the raw payload whether it contains MAC data or not. It is however still encrypted when in the raw. It will be decrypted before being delivered to your device application.
+
+If you're really interested in the raw payload: you can use a packet decoder at https://discord.com/channels/404106811252408320/730245319882965093/816533671368458240
+
+
+### Data Rate Spreading factor after Join
+RE: "The data spreading factor/bw is SF10BW125"
+For US SF10 equates to DR_0, for joins it seems common to use SF10 (DR_0) for most attempts with SF7 (DR_3) or SF8 (DR_4) tossed in for randomness.
+ What the runtimes use after a join seems to be implementation dependent.
+Some will use what ever data rate (SF) resulted in a successful join, some have a runtime global define, some allow override via  sketch #define, some actually support an API. Might be interesting to know what TTGO's runtime does.
