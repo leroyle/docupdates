@@ -1,4 +1,16 @@
 
+### Having Trouble Connecting to Helium?
+Details such as these will help the community help you get on track
+- edge node device or gateway ( please list make/model of device)
+- what LoRaWan region are you targeting
+- what have you done, point to specific document if you followed one  
+    * Look for a Helium doc for your device (https://docs.helium.com/use-the-network/devices/development/st-b-l072z-lrwan1/)
+- what is your development operating system (Windows/Linux)  - could make a difference, probably not
+- what is your IDE (Arduino/PlatformIO/Eclipse/Keil/STMCube32/...)
+- give a pointer to the script your using ( delete your console credentials first though)
+- have you enabled debug logging at the device, what does it show
+- have you enabled console side device debug view, what does it show.
+- what exactly do you see happening, not happening
 
 ### 1. A word about join failures
 
