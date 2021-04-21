@@ -264,4 +264,7 @@ If a device application with ADR enabled requires a larger packet size than a da
     * the device runtime "might" return a send API fail status that contains an error code that "could" be used to decern a too larger of packet is being attempted. It's not clear at this time if this is a viable strategy. 
 
 
+### LoRaWan Packet Decoder
+[Decode base64 payload packet](https://lorawan-packet-decoder-0ta6puiniaut.runkit.sh/)
 
+At times it may be beneficial to look inside a LoRaWan packet, look into the network MAC commands that come across with our packets but are stripped out by the runtimes before the packet is forwarded on to the end node device application. This decoder will allow you to do that. Note however, the output is still very cryptic. You really need a copy of the spec in order to "understand" the MAC command. Your payload data will be there as well, but alas, it's still encrypted. Its the device runtimes job to decrypt the user data.
