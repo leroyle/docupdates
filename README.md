@@ -104,7 +104,15 @@ data is not automatically stored, nor is the presentation of the data started wi
 The usage of the Console debug view is documented here: https://docs.helium.com/use-the-network/console/debug/
 The debug view can be very helpful when trying to diagnose communications issues.
 
-  
+#### Decoding Network MAC commands
+In addition to the device application data packet uplink and downlink messages we on occasion see additional MAC command data being trasnferred along with the application data. If you see a transmission that contains more data in the packet than expected chances are the packet contains network MAC commands. The MAC commands are interpreted by the device LoRaWan runtime and are not forwarded on to the device appication.
+The following online packet decoder can be used to extract the MAC commands but it still is not entirely in a human readable form. 
+The decoder found [here](https://lorawan-packet-decoder-0ta6puiniaut.runkit.sh/)
+Below you will find some documents that can help to interpret the bits exposed by the packet decoder
+
+[RF Wireless World](https://www.rfwireless-world.com/Tutorials/LoRaWAN-MAC-layer-inside.html)  
+[LoRaWan Spec](https://lora-alliance.org/wp-content/uploads/2020/11/lorawan1.0.3.pdf)
+
  
 ### 3. Network Data Flow
   The following diagram illustrates one possible communication flow from an edge node device, through the Helium Console and on to the integration server.
