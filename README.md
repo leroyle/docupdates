@@ -276,3 +276,13 @@ If a device application with ADR enabled requires a larger packet size than a da
 [Decode base64 payload packet](https://lorawan-packet-decoder-0ta6puiniaut.runkit.sh/)
 
 At times it may be beneficial to look inside a LoRaWan packet, look into the network MAC commands that come across with our packets but are stripped out by the runtimes before the packet is forwarded on to the end node device application. This decoder will allow you to do that. Note however, the output is still very cryptic. You really need a copy of the spec in order to "understand" the MAC command. Your payload data will be there as well, but alas, it's still encrypted. Its the device runtimes job to decrypt the user data.
+
+### Arduino IDE Boards Manager Issue
+We have seen instances of the Arduino IDE reporting .json file download failures when opening up the Arduino Boards manager panel.
+Here is an example from the Heltec forum:  http://community.heltec.cn/t/wifi-lora-32-v2-json-config-wont-load-for-arduino-ide/3003
+This is not normally an issue if the IDE has already downloaded the .json file, however it can be a show stopper if the IDE is trying to do the initial download of the .json file.
+If this is the case one can manually copy the file:
+* browse to the .json file location
+* copy the .json content
+* paste it into the same .json file name in the arduino15 directory. Might be ~/.arduino15, might be
+* You will probably still see the Download error message, but the manager should be able to  find your package.
