@@ -113,6 +113,8 @@ Below you will find some documents that can help to interpret the bits exposed b
 [RF Wireless World](https://www.rfwireless-world.com/Tutorials/LoRaWAN-MAC-layer-inside.html)  
 [LoRaWan Spec](https://lora-alliance.org/wp-content/uploads/2020/11/lorawan1.0.3.pdf)
 
+NOTE: There has been recent work by the Helium console dev team to expose the MAC commands and their meanings within the device debug view. Once that's fully implemented hopefully we will not need to use the above decoder.
+
  
 ### 3. Network Data Flow
   The following diagram illustrates one possible communication flow from an edge node device, through the Helium Console and on to the integration server.
