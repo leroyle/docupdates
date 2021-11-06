@@ -1,4 +1,29 @@
 
+### Helium Network Troubleshooting Guide
+This document is intended to help diagnose issues connecting to and using the Helium network. As the network and it's various components are seeing constant development and enhancements some of this information may be out of date.
+Please open an issue if you notice something that needs to be corrected.
+This document is a work in progress (occasionally).
+
+
+- [Having Trouble Connecting to Helium?](#having-trouble-connecting-to-helium)
+- [A word about join failures](#a-word-about-join-failures)
+- [Successful Join](#successful-join)
+- [Helium Console Activities](#helium-console-activities)
+- [Console Decoder Function](#console-decoder-function)
+- [Helium Console device debug view](#helium-console-device-debug-view)
+- [Decoding Network MAC commands](#decoding-network-mac-commands)
+- [Network Data Flow](#network-data-flow)
+- [The data flow to and from device and Helium console](#the-data-flow-to-and-from-device-and-helium-console)
+- [Typical LoRaWan Settings](#typical-lorawan-settings)
+- [LoRaWan Subband](#lorawan-subband)
+- [Downlink Shows Larger Packet Size Than Expected](#downlink-shows-larger-packet-size-than-expected)
+- [Data Rate and Spreading factor after Join](#data-rate-and-spreading-factor-after-join)
+- [LoRaWan Packet Decoder](#lorawan-packet-decoder)
+- [Troubleshooting Missing Downlink Messages](#troubleshooting-missing-downlink-messages)
+- [Arduino IDE Boards Manager Issue](#arduino-ide-boards-manager-issue)
+
+
+
 ### Having Trouble Connecting to Helium?
 Details such as these will help the community help you get on track
 - edge node device or gateway ( please list make/model of device)
@@ -12,10 +37,10 @@ Details such as these will help the community help you get on track
 - have you enabled console side device debug view, what does it show.
 - what exactly do you see happening, not happening
 
-### 1. A word about join failures
+### A word about join failures
 
 The process of joining the Helium network can seem to be fickle at times. This is probably the hardest piece of the LoRaWan communications stream to debug as you have limited exposure to what is happening. There are several factors to keep in mind
-##### Credentials
+#### Credentials
 Helium only supports OTAA joins at this time. This means your edge node device application must be provisioned with the the proper LoRaWan credentials as found within the device configuration view within the Console. These includes
 ```
 - Device EUI
@@ -26,17 +51,17 @@ Helium only supports OTAA joins at this time. This means your edge node device a
 #### NOTE: These "must" be added to your device sketch in the proper byte vs string format as well as with the proper Endian-ness. These can and do vary from one edge node device LoRaWan runtime implementation to the next. Your device will not join the network if these are not exactly correct.
 Visit the follow Wikipedia page for a comprehensive discussion of endianness https://en.wikipedia.org/wiki/Endianness
 
-##### LoRaWan Configuration Parameters
+#### LoRaWan Configuration Parameters
 There are a few parameters that must be configured properly not only for the join process to success but for further communications as well. These are detailed further in their own section [here](#LoRaWan_Configuration_Variables).  
 For joins we need to pay particular attention to LoRaWan Region, Claas (Class A only) and Activation Mode(OTAA only), LoRaWan subband: should be 2 for best join possibiity.
 What these are specifically named and how they are set varies from one LoRaWan runtime implementation to another.
 
-##### Distance to Nearest Hotspot
+#### Distance to Nearest Hotspot
 While LoRaWan is advertised as a long distance communications protocol there are many factors that can limit connectivity. The primary being unubstructed line of sight. Trees, buildings, mountains can limit the reach of your devices.
 If there is any distance at all between your edge node device and the nearest hot spot and you are having trouble joining the network. It is suggested you take a field trip to get closer to the target hot spot to see if connection can be made when in close proximity.
 Most runtime implementations will vary the data rate and perhaps power level used for joining in order to try to compenstate for hot spot distance. The specific algorithm and effectiveness is highly LoRaWan runtime implementation dependent. For the North American region it is common to use a spreading factor of 10 ( SF10 - equates to DR_0) along with occasional randome use of SF7 (DR_3) or SF8 (DR_4) tossed in. As alot of this, it's runtime implementation dependent.
 
- ##### Edge node device LoRaWan runtime join retry implementation
+ ### Edge node device LoRaWan runtime join retry implementation
 In general when your device tries to join the network if an initial join fails the runtime will attempt retries.
 Each runtime implementation of the LoRaWan specification may handle join retries in a different manner as this is not detailed by the specification.
 * Some runtimes will continuously try to join the network until power is removed.
@@ -46,17 +71,17 @@ Each runtime implementation of the LoRaWan specification may handle join retries
     * aborting the join retry with notification sent to the device application via a callback mechanism
     * or aborting retry without notifying the device application (which is really not acceptable).
  
-##### Successful Join
+### Successful Join
 An indication of a successful join is generally provided via a target device debug message dumped to the serial debug port, if attached and active, via an led indication of the device application if programmed to provide it, or via the Helium Console device debug view documented here: https://docs.helium.com/use-the-network/console/debug/  
 
 After the join has succedded the normal device uplink messages can be sent. Beware however of the time on air limitation of the LoRaWan specification. You cannot and most runtimes will not let you continuus transmit over the air. The time constraints are Region specific. Trying to send message too fast may result in lost messages and interruption of the timing windows required for the device to receive downlink messages from the network.
 
-### 2. Helium Console Activities
+### Helium Console Activities
 
 Now that basic communications between the edge node device and the Helium network has been confirmed there are a few things one can do within the Helium Console product that you should be aware of when implementing your own custom device application.
 
 
-#### Console Decoder Function
+### Console Decoder Function
 
 The LoRaWan specification encourages minimal over the air data packet transmissions. It is 
 expected that the edge node device will implement a data packing scheme so as to reduce the overall size of the data packet that is transmitted over the air.
@@ -71,7 +96,7 @@ The repository can be found at: https://github.com/helium/console-decoders.
 
 NOTE: The user data packet is encoded using a base64 format when being sent over the air. The data presented to the Console decoder function has been base64 decoded for you. If one waits and decodes at the cloud integration server that packet data is still base64 encoded thus you will need to base64 decode the packet  before re-expansion at the server.
 
-##### Adding a try/catch mechanism to your decoder
+#### Adding a try/catch mechanism to your decoder
 During decoder development it is sometimes helpful to implement javascript try/catch mechanisms with your decoders in order to catch unforseen errors. One example might be: 
 ```
 var myMsg = {};
@@ -97,14 +122,14 @@ Your function threw an exception
 As you can see your debugging effort might benefit from using a try/catch mechanism within your decoder.
 
 
-#### Helium Console device debug view
+### Helium Console device debug view
 
 Often it is helpful to be able to visually see the data flows that occur between the edge node device and the cloud integration server. The Helium Console provides a method for viewing  packet data as well as other associated meta-data as the packets flow through the Console. Due to security considerations the 
 data is not automatically stored, nor is the presentation of the data started without a specific user action.
 The usage of the Console debug view is documented here: https://docs.helium.com/use-the-network/console/debug/
 The debug view can be very helpful when trying to diagnose communications issues.
 
-#### Decoding Network MAC commands
+### Decoding Network MAC commands
 In addition to the device application data packet uplink and downlink messages we on occasion see additional MAC command data being trasnferred along with the application data. If you see a transmission that contains more data in the packet than expected chances are the packet contains network MAC commands. The MAC commands are interpreted by the device LoRaWan runtime and are not forwarded on to the device appication.
 The following online packet decoder can be used to extract the MAC commands but it still is not entirely in a human readable form. 
 The decoder found [here](https://lorawan-packet-decoder-0ta6puiniaut.runkit.sh/)
@@ -116,7 +141,7 @@ Below you will find some documents that can help to interpret the bits exposed b
 NOTE: There has been recent work by the Helium console dev team to expose the MAC commands and their meanings within the device debug view. Once that's fully implemented hopefully we will not need to use the above decoder.
 
  
-### 3. Network Data Flow
+### Network Data Flow
   The following diagram illustrates one possible communication flow from an edge node device, through the Helium Console and on to the integration server.
   Note: the ordering of the data flows as seen within the Console device debug view may not eactly match those seen in the illustration below.
 
@@ -128,6 +153,10 @@ This next diagram illustrates the data flow when sending unconfirmed uplink mess
 This next diagram illustrates the data flow when sending confirmed uplink messages.
   ![](./unconfirmed.png)
   
+### The data flow to and from device and Helium console
+   device->hot spot -> router -> console  
+   console -> router -> hot spot -> device
+
   ## Editor Note:
   We should add the flow for confirmed messages, downlinks, ADR 
   
@@ -176,7 +205,7 @@ board_build.arduino.lorawan.rgb = DEACTIVE
 board_build.arduino.lorawan.debug_level = FREQ_AND_DIO
 ```
 
-### Typical LoRaWan Configuration Settings for Region US915 (North America)
+#### Typical LoRaWan Configuration Settings for Region US915 (North America)
 | Name               |  US915 Value    | Description                                                               |
 |:-------------------|:----------------|:--------------------------------------------------------------------------|
 | Region             | US915           | (US915/EU868/CN470/etc) LoRaWan Region designation                        |
@@ -190,7 +219,8 @@ board_build.arduino.lorawan.debug_level = FREQ_AND_DIO
 Misc:
 
 Other important configurations that are set either via global variable or runtime API: (again it varies by implementation)
-### LoRaWan Subband
+
+#### LoRaWan Subband
 The runtimes definition of sub band, also known as channel mask or usersChannelsMask is used to inform the runtime of specific frequency channels that should be used for optimal communications with the network.  
 For instance the LoRaWan specificiation calls out the use of 64 frequency bands that could be used when attempting the intial join. Helium as well as other providers have chosen to limit the number of frequencies supported to one sub band or 8 frequencies.  
 Unless we inform the runtime of this fact it will attempt to use all 64 channels in a random fashion. Thus it may take many retries before a supported frequency is attempted thus causing at times an unacceptable delay in makeing that initial join.
@@ -242,7 +272,7 @@ Your user payload should be at the tail end of the raw payload whether it contai
 If you're really interested in the raw payload: you can use a packet decoder at https://discord.com/channels/404106811252408320/730245319882965093/816533671368458240
 
 
-### Data Rate/Spreading factor after Join
+### Data Rate and Spreading factor after Join
 Once a network join has succeeded, what data rate is used when sending user data up to the network (uplink)?
 That depends.
 
@@ -278,6 +308,29 @@ If a device application with ADR enabled requires a larger packet size than a da
 [Decode base64 payload packet](https://lorawan-packet-decoder-0ta6puiniaut.runkit.sh/)
 
 At times it may be beneficial to look inside a LoRaWan packet, look into the network MAC commands that come across with our packets but are stripped out by the runtimes before the packet is forwarded on to the end node device application. This decoder will allow you to do that. Note however, the output is still very cryptic. You really need a copy of the spec in order to "understand" the MAC command. Your payload data will be there as well, but alas, it's still encrypted. Its the device runtimes job to decrypt the user data.
+
+### Troubleshooting Missing Downlink Messages
+
+#### There could be a few reasons for missing downlinks
+- your device is out of good reception range. I have seen with a Cubecell where transmits to the network make it ok, but reception from the network is not. It was a small window seen while mapping. As I move out of range the transmits to make it, the receptions from do not.
+- the device is receiving the downlink but is not acting on it.  Perhaps this message is not interpreted correctly or feed back is missing. In other words some problem at the device side
+- the downlink sent timing is off such that the device is not receiving it when it expects to. Could be the device side receive window or the network side transmit side send window timing is not correct
+- The device is sending the uplink, but the network does not receive it or is seeing some sort of error preventing the down link from being sent
+- The network is having an issue 
+ 
+#### So what to do? 
+- make sure you are well within range of the hot spot you are connecting with, at least for testing purposes.
+- Check the console device debug view for errors within the uplink and downlink JSON
+- if you have queued downlink messages the next should be sent after the next uplink. You will be able to see that and it's content in the debug view.
+- is the down link just not sent, queue count unchanged? Or is it sent but not received by the device
+- check the reported SNR/RSSI of the uplink messages. Is there a difference between them when the down link is delivered vs when it's not?
+- enable all debug message within your device debug output. The runtimes may have some additional #defines to enable more debug info if you are building your own app. If it's a preinstalled app device you will need to find a way to dump debug data at the device side. You want to determine if the device is receiving and operating on the downlink.
+
+The data flow  device->hot spot -> router -> console
+                           console -> router -> hot spot -> device
+so there are a couple of spots where the downlink could get lost.
+
+If you get no where with info from the community either from here or console Gather up all the info you can and open an issue. github.com/helium/console or github.com/helium/router. Either should work, the team will route to the proper place. 
 
 ### Arduino IDE Boards Manager Issue
 We have seen instances of the Arduino IDE reporting .json file download failures when opening up the Arduino Boards manager panel.
