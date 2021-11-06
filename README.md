@@ -29,12 +29,12 @@ Details such as these will help the community help you get on track
 - edge node device or gateway ( please list make/model of device)
 - what LoRaWan region are you targeting
 - what have you done, point to specific document if you followed one  
-    * Look for a Helium doc for your device (https://docs.helium.com/use-the-network/devices/development/st-b-l072z-lrwan1/)
+    * Look for a Helium doc for your device (https://docs.helium.com/use-the-network/devices)
 - what is your development operating system (Windows/Linux)  - could make a difference, probably not
 - what is your IDE (Arduino/PlatformIO/Eclipse/Keil/STMCube32/...)
 - give a pointer to the script your using ( delete your console credentials first though)
 - have you enabled debug logging at the device, what does it show
-- have you enabled console side device debug view, what does it show.
+- have you enabled console side device debug view, what does it show. (https://docs.helium.com/use-the-network/console/debug/#using-the-debug-tool)
 - what exactly do you see happening, not happening
 
 ### A word about join failures
@@ -269,8 +269,7 @@ If you have ADR enabled you will see another larger payload downlink after about
 
 Your user payload should be at the tail end of the raw payload whether it contains MAC data or not. It is however still encrypted when in the raw. It will be decrypted before being delivered to your device application.
 
-If you're really interested in the raw payload: you can use a packet decoder at https://discord.com/channels/404106811252408320/730245319882965093/816533671368458240
-
+If you're really interested in the raw payload: you can use a packet decoder at https://lorawan-packet-decoder-0ta6puiniaut.runkit.sh
 
 ### Data Rate and Spreading factor after Join
 Once a network join has succeeded, what data rate is used when sending user data up to the network (uplink)?
