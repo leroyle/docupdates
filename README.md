@@ -129,7 +129,8 @@ Often it is helpful to be able to visually see the data flows that occur between
 data is not automatically stored, nor is the presentation of the data started without a specific user action.
 The usage of the Console debug view is documented here: https://docs.helium.com/use-the-network/console/debug/
 The debug view can be very helpful when trying to diagnose communications issues.  
-The debug view JSON data will contain a "payload" field. This is your device transmitted data as well as any network commands (MAC commands) that are optionally added by the device runtime. These MAC commands may be requests to the network or acknowlegements for network driven commands to the device runtime. Your device application need not be concerned about MAC command processing as that is handled by the device runtime support libraries.
+The debug view JSON data will contain a "payload" field. This is your device transmitted data as well as any network commands (MAC commands) that are optionally added by the device runtime. 
+NOTE: Recent updates to the console device debug view will now expose these MAC commands within the expanded JSON data.
 
 ### Decoding Network MAC commands
 In addition to the device application data packet uplink and downlink messages we on occasion see additional MAC command data being trasnferred along with the application data. If you see a transmission that contains more data in the packet than expected chances are the packet contains network MAC commands. The MAC commands are interpreted by the device LoRaWan runtime and are not forwarded on to the device appication.
@@ -143,14 +144,18 @@ Below you will find some documents that can help to interpret the bits exposed b
 NOTE: There has been recent work by the Helium console dev team to expose the MAC commands and their meanings within the device debug view. Once that's fully implemented hopefully we will not need to use the above decoder.
 
 ### Decoding Device Data
-If the device application data within the payload contains user
+If the device application data within the payload contains user data then it will be base64 encoded. To decode the payload you will need to use one of the following decoders. The decoded result should be the data your device transmitted to the network thus may not be directly human readable.  
+- base64 to hex if your device data is hex data  https://cryptii.com/pipes/base64-to-hex
+- base64 to string if your data is string data (not recommended)    https://www.base64decode.org/
+
+These are example decoders there are several out on the internet.
  
 ### Network Data Flow
   The following diagram illustrates one possible communication flow from an edge node device, through the Helium Console and on to the integration server.
   Note: the ordering of the data flows as seen within the Console device debug view may not eactly match those seen in the illustration below.
 
 This next diagram illustrates the data flow when sending unconfirmed uplink messages.
-  
+  dec
   ![](./unconfirmed.png)
 
 
